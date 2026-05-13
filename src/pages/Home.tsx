@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { PokemonCard } from "../components/PokemonCard";
 import type { Pokemon, PokemonNameAndUrl } from "../type/pokemon";
 import { fetchPokemonList, getIdFromUrl } from "../api/pokemon";
+import { Link } from "react-router-dom";
 
 export const Home = () => {
   const [data, setData] = useState<Pokemon[]>();
@@ -26,7 +27,9 @@ export const Home = () => {
   return (
     <>
       {data?.map((poke) => (
-        <PokemonCard key={poke.id} data={poke ?? null} />
+        <Link key={poke.id} to={`/detail/${poke.id}`}>
+          <PokemonCard data={poke ?? null} />
+        </Link>
       ))}
     </>
   );
