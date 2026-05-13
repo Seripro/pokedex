@@ -7,3 +7,8 @@ export const fetchPokemonList = async (
   const data = await response.json();
   return data.results;
 };
+
+export const getIdFromUrl = (url: string): string => {
+  const parts = url.split("/");
+  return parts[parts.length - 2];
+};
