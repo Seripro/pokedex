@@ -9,6 +9,7 @@ export const Home = () => {
   const [data, setData] = useState<PokemonDetailType[]>([]);
   const [allPokes, setAllPokes] = useState<PokemonDetailType[]>([]);
   const [isModalOpen, setModalOpen] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [searchParams] = useSearchParams();
   const selectedTypes = searchParams.get("types")?.split(",") || [];
 
@@ -16,26 +17,35 @@ export const Home = () => {
   const closeModal = () => setModalOpen(false);
   useEffect(() => {
     const fetchData = async () => {
-      let allData = await getPokemonsDetail(1, 151);
-      setAllPokes(allData);
-      if (selectedTypes.length) {
-        for (const type of selectedTypes) {
-          allData = allData.filter((poke) => {
-            for (const t of poke.types) {
-              if (t.type.name === type) {
-                return true;
+      setLoading(true);
+      try {
+        let allData = await getPokemonsDetail(1, 151);
+        setAllPokes(allData);
+        if (selectedTypes.length) {
+          for (const type of selectedTypes) {
+            allData = allData.filter((poke) => {
+              for (const t of poke.types) {
+                if (t.type.name === type) {
+                  return true;
+                }
               }
-            }
-            return false;
-          });
+              return false;
+            });
+          }
+          setData(allData);
+        } else {
+          setData(allData);
         }
-        setData(allData);
-      } else {
-        setData(allData);
+      } catch (e) {
+        console.log(e);
+      } finally {
+        setLoading(false);
       }
     };
     fetchData();
   }, [searchParams]);
+
+  if (loading) return <p>loading...</p>;
 
   return (
     <>
