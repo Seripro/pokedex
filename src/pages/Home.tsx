@@ -2,32 +2,50 @@ import { useEffect, useState } from "react";
 import { PokemonCard } from "../components/PokemonCard";
 import type { PokemonDetailType } from "../type/pokemon";
 import { getPokemonsDetail } from "../api/pokemon";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { Modal } from "../components/Modal";
 
 export const Home = () => {
-  const [data, setData] = useState<PokemonDetailType[]>();
+  const [data, setData] = useState<PokemonDetailType[]>([]);
+  const [allPokes, setAllPokes] = useState<PokemonDetailType[]>([]);
   const [isModalOpen, setModalOpen] = useState(false);
+  const [searchParams] = useSearchParams();
+  const selectedTypes = searchParams.get("types")?.split(",") || [];
 
   const openModal = () => setModalOpen(true);
   const closeModal = () => setModalOpen(false);
   useEffect(() => {
     const fetchData = async () => {
-      const allData = await getPokemonsDetail(1, 151);
-      setData(allData);
+      let allData = await getPokemonsDetail(1, 151);
+      setAllPokes(allData);
+      if (selectedTypes.length) {
+        for (const type of selectedTypes) {
+          allData = allData.filter((poke) => {
+            for (const t of poke.types) {
+              if (t.type.name === type) {
+                return true;
+              }
+            }
+            return false;
+          });
+        }
+        setData(allData);
+      } else {
+        setData(allData);
+      }
     };
     fetchData();
-  }, []);
+  }, [searchParams]);
 
   return (
     <>
       <div>
         <button onClick={openModal}>モーダルを開く</button>
-        <Modal isOpen={isModalOpen} onClose={closeModal} />
+        <Modal isOpen={isModalOpen} onClose={closeModal} pokemons={allPokes} />
       </div>
-      {data?.map((poke) => (
+      {data.map((poke) => (
         <Link key={poke.id} to={`/detail/${poke.id}`} state={poke}>
-          <PokemonCard data={poke ?? null} />
+          <PokemonCard data={poke} />
         </Link>
       ))}
     </>
