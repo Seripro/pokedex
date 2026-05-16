@@ -12,6 +12,7 @@ export const Modal = (props: Props) => {
   const { isOpen, onClose, pokemons } = props;
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const [, setSearchParams] = useSearchParams();
+  const [inputName, setInputName] = useState<string>();
   if (!isOpen) {
     return null;
   }
@@ -28,7 +29,15 @@ export const Modal = (props: Props) => {
   };
 
   const handleSearch = () => {
-    setSearchParams({ types: selectedTypes.join(",") });
+    if (selectedTypes.length && inputName) {
+      setSearchParams({ types: selectedTypes.join(","), name: inputName });
+    } else if (!selectedTypes.length && inputName) {
+      setSearchParams({ name: inputName });
+    } else if (selectedTypes.length && !inputName) {
+      setSearchParams({ types: selectedTypes.join(",") });
+    } else if (!selectedTypes.length && !inputName) {
+      setSearchParams();
+    }
     onClose();
   };
 
@@ -38,11 +47,16 @@ export const Modal = (props: Props) => {
     onClose();
   };
 
+  const handleChangeName = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputName(e.target.value);
+  };
+
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <h2>モーダルタイトル</h2>
-        <p>これはモーダルの内容です。</p>
+        <h2>ポケモン検索</h2>
+        <label id="poke-name" />
+        <input id="poke-name" onChange={handleChangeName} value={inputName} />
         {allTypes.map((type) => {
           return (
             <div key={type}>
