@@ -12,6 +12,7 @@ export const Home = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [searchParams] = useSearchParams();
   const selectedTypes = searchParams.get("types")?.split(",") || [];
+  const selectedName = searchParams.get("name");
 
   const openModal = () => setModalOpen(true);
   const closeModal = () => setModalOpen(false);
@@ -21,6 +22,8 @@ export const Home = () => {
       try {
         let allData = await getPokemonsDetail(1, 151);
         setAllPokes(allData);
+
+        // タイプで絞る
         if (selectedTypes.length) {
           for (const type of selectedTypes) {
             allData = allData.filter((poke) => {
@@ -32,10 +35,15 @@ export const Home = () => {
               return false;
             });
           }
-          setData(allData);
-        } else {
-          setData(allData);
         }
+
+        // 名前の部分一致で絞る
+        if (selectedName) {
+          allData = allData.filter(
+            (poke) => poke.name.indexOf(selectedName) > -1,
+          );
+        }
+        setData(allData);
       } catch (e) {
         console.log(e);
       } finally {
