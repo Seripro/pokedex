@@ -1,23 +1,17 @@
 import { useEffect, useState } from "react";
 import type { PokemonDetailType } from "../type/pokemon";
 import type { StatName } from "../type/stats";
-import { getPokemonById } from "../api/pokemon";
-import { useParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 export const PokemonDetail = () => {
+  const location = useLocation();
+  const poke = location.state;
   const [data, setData] = useState<PokemonDetailType>();
-  const { id } = useParams();
   useEffect(() => {
-    const fetchData = async () => {
-      if (id) {
-        try {
-          setData(await getPokemonById(id));
-        } catch (e) {
-          console.log(e);
-        }
-      }
+    const manageState = () => {
+      setData(poke);
     };
-    fetchData();
+    manageState();
   }, []);
   return (
     <div>
@@ -28,7 +22,7 @@ export const PokemonDetail = () => {
       </div>
       <div>
         {data?.types.map((item) => {
-          return <p>{item.type.name}</p>;
+          return <p key={item.type.name}>{item.type.name}</p>;
         })}
         <p>
           高さ：{data ? `${data.height / 10} m` : "情報が存在しません"} 重さ：
@@ -36,18 +30,18 @@ export const PokemonDetail = () => {
         </p>
         {data?.abilities.map((item) => {
           return (
-            <>
+            <div key={item.ability.name}>
               {item.is_hidden ? (
                 <p>隠れ特性：{item.ability.name}</p>
               ) : (
                 <p>特性：{item.ability.name}</p>
               )}
-            </>
+            </div>
           );
         })}
       </div>
       <div>
-        {data?.stats.map((item) => {
+        {data?.stats.map((item, index) => {
           const statLabels = {
             hp: "HP",
             attack: "こうげき",
@@ -57,7 +51,7 @@ export const PokemonDetail = () => {
             speed: "すばやさ",
           };
           return (
-            <p>
+            <p key={index}>
               {statLabels[item.stat.name as StatName]}：{item.base_stat}
             </p>
           );
