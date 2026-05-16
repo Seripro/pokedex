@@ -18,3 +18,18 @@ export const getPokemonById = async (id: string) => {
   const data: PokemonDetailType = await response.json();
   return data;
 };
+
+export const getPokemonsDetail = async (
+  startCount: number,
+  endCount: number,
+): Promise<PokemonDetailType[]> => {
+  const responses = await Promise.all(
+    Array.from({ length: endCount - startCount + 1 }, (_, i) =>
+      fetch(`https://pokeapi.co/api/v2/pokemon/${i + startCount}`),
+    ),
+  );
+  const data = await Promise.all(
+    responses.map((r) => r.json() as Promise<PokemonDetailType>),
+  );
+  return data;
+};
