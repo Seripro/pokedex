@@ -26,7 +26,7 @@ export const Home = () => {
         <Modal isOpen={isModalOpen} onClose={closeModal} />
       </div>
       {data?.map((poke) => (
-        <Link key={poke.id} to={`/detail/${poke.id}`}>
+        <Link key={poke.id} to={`/detail/${poke.id}`} state={poke}>
           <PokemonCard data={poke ?? null} />
         </Link>
       ))}
