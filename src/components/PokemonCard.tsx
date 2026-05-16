@@ -1,7 +1,7 @@
-import type { Pokemon } from "../type/pokemon";
+import type { PokemonDetailType } from "../type/pokemon";
 
 type Props = {
-  data: Pokemon | null;
+  data: PokemonDetailType | null;
 };
 
 export const PokemonCard = (props: Props) => {
